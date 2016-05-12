@@ -1,8 +1,20 @@
+#!/usr/bin/env python2
+"""Parses ems xml file into csv
+Default input file is ems.xml
+Specify input file with -i or --input==
+Outputs to screen so redirect with > outfile.csv
+"""
+
 __author__ = 'mneil'
 
 import sys
 import time
 from xml.etree.cElementTree import *
+import getopt
+
+
+def usage():
+    print __doc__
 
 
 def print_to_log(logString):
@@ -19,8 +31,22 @@ def remove_non_ascii(s):
         return ""
 
 debug_it = 0
+input_file = "ems.xml"
 
-tree = parse('ems.xml')
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "hi:", ["help", "input="])
+except getopt.GetoptError:
+    usage()
+    sys.exit(2)
+
+for opt, arg in opts:
+    if opt in ("-h", "--help"):
+        usage()
+        sys.exit()
+    elif opt in ("-i", "--input"):
+        input_file = arg
+
+tree = parse(input_file)
 root = tree.getroot()
 xml_prefix = root.tag.split('}')[0] + '}'
 print("Name,Deprecated,Severity,Description,Corrective Action,SNMP Trap,ASUP Reason,Asup Msg")
