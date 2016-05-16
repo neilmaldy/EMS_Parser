@@ -15,14 +15,14 @@ import glob
 
 
 def usage():
-    print __doc__
+    print(__doc__)
 
 
 def print_to_log(logString):
     """ Print to log file (stderr)
     Prints the logString to stderr, prepends date and time
     """
-    print >> sys.stderr, (time.strftime("%Y%m%d-%H:%M:%S") + ":ems_to_csv: " + logString)
+    print(time.strftime("%Y%m%d-%H:%M:%S") + ":ems_to_csv: " + logString, file=sys.stderr)
 
 
 def remove_non_ascii(s):
@@ -35,7 +35,7 @@ def remove_non_ascii(s):
 debug_it = 0
 
 
-def main(input_files = [], output_to_screen = False):
+def main(input_files=[], output_to_screen=False):
 
     if not input_files:
         input_files = glob.glob("*.xml")
@@ -51,8 +51,8 @@ def main(input_files = [], output_to_screen = False):
         tree = parse(input_file)
         root = tree.getroot()
         xml_prefix = root.tag.split('}')[0] + '}'
-        print >> output_file, "EMS events " + input_file
-        print >> output_file, ("\nName,Deprecated,Severity,Description,Corrective Action,SNMP Trap,ASUP Reason,Asup Msg")
+        print("EMS events " + input_file, file=output_file)
+        print("\nName,Deprecated,Severity,Description,Corrective Action,SNMP Trap,ASUP Reason,Asup Msg", file=output_file)
         started_count = 0
         finished_count = 0
         for child in root.findall(xml_prefix + 'event-def'):
@@ -159,20 +159,21 @@ def main(input_files = [], output_to_screen = False):
                 print_to_log(reason)
                 print_to_log(msgno)
 
-            print >> output_file, ','.join([remove_non_ascii(name),
+            print(','.join([remove_non_ascii(name),
                             remove_non_ascii(deprecated),
                             remove_non_ascii(severity),
                             remove_non_ascii(description), remove_non_ascii(corrective_action),
                             remove_non_ascii(snmp_trap),
                             remove_non_ascii(reason),
-                            remove_non_ascii(msgno)])
-            finished_count +=1
+                            remove_non_ascii(msgno)]), file=output_file)
+            finished_count += 1
 
-        print >> output_file, "\nProcessed " + str(finished_count) + " of " + str(started_count) + " events from " + input_file
+        print("\nProcessed " + str(finished_count) + " of " + str(started_count) + " events from " + input_file, file=output_file)
         print_to_log(input_file + ": Processed " + str(finished_count) + " of " + str(started_count) + " events from " + input_file)
         if not output_to_screen:
             output_file.close()
 
+    print_to_log("Done.")
 
 if __name__ == "__main__":
     input_files = []
